@@ -1,5 +1,11 @@
 # Changelog for v1.x
 
+## v1.0.5 (2022-07-05)
+
+### Enhancements
+
+  * Updated all references to point to new repo location owned by Parallel Markets
+
 ## v1.0.4 (2022-07-05)
 
 ### Enhancements
