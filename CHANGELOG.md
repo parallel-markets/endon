@@ -1,5 +1,11 @@
 # Changelog for v1.x
 
+## Unreleased
+
+### Enhancements
+
+  * Minor documentation / @spec fixes (#1)
+
 ## v1.0.5 (2022-07-05)
 
 ### Enhancements
