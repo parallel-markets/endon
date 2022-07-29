@@ -17,6 +17,7 @@ defmodule UserSingle do
   defmodule Repo do
     def one(input), do: i(input)
     def all(input), do: [i(input)]
+    def transaction(func), do: {:ok, func.()}
   end
 
   use Endon, repo: Repo
