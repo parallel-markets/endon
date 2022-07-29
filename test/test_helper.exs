@@ -17,6 +17,7 @@ defmodule UserSingle do
   defmodule Repo do
     def one(input), do: i(input)
     def all(input), do: [i(input)]
+    def transaction(func), do: {:ok, func.()}
   end
 
   use Endon, repo: Repo
@@ -30,6 +31,8 @@ defmodule UserNone do
   defmodule Repo do
     def one(_input), do: nil
     def all(_input), do: []
+    def transaction(func), do: {:ok, func.()}
+    def insert(changeset), do: {:ok, changeset.changes}
   end
 
   use Endon, repo: Repo

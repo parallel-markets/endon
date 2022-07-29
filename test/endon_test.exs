@@ -76,6 +76,13 @@ defmodule EndonTest do
                "from u0 in UserSingle, where: u0.id == ^2, limit: ^1"
     end
 
+    test "when using find_or_create_by" do
+      assert UserSingle.find_or_create_by(id: 1) ==
+               {:ok, "from u0 in UserSingle, where: u0.id == ^1, limit: ^1"}
+
+      assert UserNone.find_or_create_by(id: 2) == {:ok, %{id: 2}}
+    end
+
     test "when using fetch" do
       assert UserSingle.fetch(1) == {:ok, "from u0 in UserSingle, where: u0.id in ^[1]"}
 

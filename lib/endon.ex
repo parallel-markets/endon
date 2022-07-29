@@ -223,7 +223,8 @@ defmodule Endon do
       Returns `{:ok, struct}` if one is found/created, or `{:error, changeset}` if there is
       a validation error.
       """
-      @spec find_or_create_by(where_conditions()) :: Ecto.Schema.t()
+      @spec find_or_create_by(where_conditions()) ::
+              {:ok, Ecto.Schema.t()} | {:error, Ecto.Changeset.t()}
       def find_or_create_by(params),
         do: Helpers.find_or_create_by(@repo, __MODULE__, params)
 
