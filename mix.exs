@@ -2,7 +2,7 @@ defmodule Endon.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/parallel-markets/endon"
-  @version "1.0.5"
+  @version "1.0.6"
 
   def project do
     [
@@ -49,10 +49,10 @@ defmodule Endon.MixProject do
 
   defp deps do
     [
-      {:ecto, "~> 3.0"},
+      {:ecto, "~> 3.8"},
       {:ex_doc, "~> 0.28", only: :dev},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.2", only: [:dev], runtime: false}
     ]
   end
 
