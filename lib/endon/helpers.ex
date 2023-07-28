@@ -186,7 +186,13 @@ defmodule Endon.Helpers do
 
   def first(repo, module, count, opts) do
     {conditions, opts} = Keyword.pop(opts, :conditions, [])
-    where_opts = Keyword.put(opts, :limit, count)
+    pk = get_primary_key(module)
+
+    where_opts =
+      [order_by: [asc: pk]]
+      |> Keyword.merge(opts)
+      |> Keyword.put(:limit, count)
+
     result = where(repo, module, conditions, where_opts)
     if where_opts[:limit] == 1, do: first_or_nil(result), else: result
   end

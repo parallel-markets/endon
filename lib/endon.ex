@@ -239,7 +239,7 @@ defmodule Endon do
 
       ## Options
 
-        * `:order_by` - By default, orders by primary key descending
+        * `:order_by` - By default, orders by primary key ascending
         * `:conditions` - Limit results to those matching these conditions.  Value can be
           anything accepted by `where/2` (including a `t:Ecto.Query.t/0`).
 

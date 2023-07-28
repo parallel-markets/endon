@@ -26,7 +26,7 @@ defmodule EndonTest do
       result = UserSingle.first(1, conditions: scoped)
 
       assert result ==
-               "from u0 in UserSingle, where: u0.id == 1, where: u0.org_id == ^123, limit: ^1"
+               "from u0 in UserSingle, where: u0.id == 1, where: u0.org_id == ^123, order_by: [asc: u0.id], limit: ^1"
     end
   end
 
