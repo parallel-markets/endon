@@ -51,6 +51,12 @@ defmodule EndonTest do
              ]
     end
 
+    test "when using where with order_by keyword" do
+      assert UserSingle.where([id: 1], order_by: [desc: :name]) == [
+               "from u0 in UserSingle, where: u0.id == ^1, order_by: [desc: u0.name]"
+             ]
+    end
+
     test "when using stream_where" do
       assert Enum.to_list(UserNone.stream_where()) == []
     end
