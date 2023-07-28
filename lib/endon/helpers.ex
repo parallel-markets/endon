@@ -11,7 +11,7 @@ defmodule Endon.Helpers do
   end
 
   def exists?(repo, module, conditions) do
-    case where(repo, module, conditions, limit: 1) do
+    case do_where(repo, module, conditions, limit: 1) do
       [] ->
         false
 
@@ -52,7 +52,8 @@ defmodule Endon.Helpers do
 
   def fetch(repo, module, ids, opts) when is_list(ids) do
     pk = get_primary_key(module)
-    result = where(repo, module, [{pk, ids}], opts)
+
+    result = do_where(repo, module, [{pk, ids}], opts)
     if length(result) == length(ids), do: {:ok, result}, else: :error
   end
 
@@ -79,7 +80,7 @@ defmodule Endon.Helpers do
   # {:error, reason} which means there was an issue in the transaction
   defp do_find_or_create_by(repo, module, conditions) do
     repo.transaction(fn ->
-      case where(repo, module, conditions, limit: 1) do
+      case do_where(repo, module, conditions, limit: 1) do
         [result] ->
           {:ok, result}
 
@@ -141,10 +142,9 @@ defmodule Endon.Helpers do
   end
 
   def where(repo, module, conditions, opts) do
-    module
-    |> add_where(conditions)
-    |> add_opts(opts, [:limit, :order_by, :offset, :preload])
-    |> repo.all()
+    pk = get_primary_key(module)
+    opts_with_defaults = Keyword.put_new(opts, :order_by, [asc: pk])
+    do_where(repo, module, conditions, opts_with_defaults)
   end
 
   def count(repo, module, conditions) do
@@ -193,7 +193,7 @@ defmodule Endon.Helpers do
       |> Keyword.merge(opts)
       |> Keyword.put(:limit, count)
 
-    result = where(repo, module, conditions, where_opts)
+    result = do_where(repo, module, conditions, where_opts)
     if where_opts[:limit] == 1, do: first_or_nil(result), else: result
   end
 
@@ -206,7 +206,7 @@ defmodule Endon.Helpers do
       |> Keyword.merge(opts)
       |> Keyword.put(:limit, count)
 
-    result = where(repo, module, conditions, where_opts)
+    result = do_where(repo, module, conditions, where_opts)
     if where_opts[:limit] == 1, do: first_or_nil(result), else: result
   end
 
@@ -287,6 +287,13 @@ defmodule Endon.Helpers do
     query
     |> Query.where(^[{f, v}])
     |> add_where(rest)
+  end
+
+  defp do_where(repo, module, conditions, opts) do
+    module
+    |> add_where(conditions)
+    |> add_opts(opts, [:limit, :order_by, :offset, :preload])
+    |> repo.all()
   end
 
   defp get_primary_key(module) do
