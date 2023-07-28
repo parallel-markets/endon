@@ -38,11 +38,15 @@ defmodule EndonTest do
 
   describe "querying records should work" do
     test "when using where" do
-      assert UserSingle.where(id: 1) == ["from u0 in UserSingle, where: u0.id == ^1, order_by: [asc: u0.id]"]
+      assert UserSingle.where(id: 1) == [
+               "from u0 in UserSingle, where: u0.id == ^1, order_by: [asc: u0.id]"
+             ]
     end
 
     test "when using where with a map" do
-      assert UserSingle.where(%{id: 1}) == ["from u0 in UserSingle, where: u0.id == ^1, order_by: [asc: u0.id]"]
+      assert UserSingle.where(%{id: 1}) == [
+               "from u0 in UserSingle, where: u0.id == ^1, order_by: [asc: u0.id]"
+             ]
     end
 
     test "when using where with limit keyword" do
