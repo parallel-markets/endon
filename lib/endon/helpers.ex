@@ -45,13 +45,13 @@ defmodule Endon.Helpers do
         result
 
       :error ->
-        [pk] = module.__schema__(:primary_key)
+        pk = get_primary_key(module)
         raise NoResultsError, queryable: add_where(module, [{pk, ids}])
     end
   end
 
   def fetch(repo, module, ids, opts) when is_list(ids) do
-    [pk] = module.__schema__(:primary_key)
+    pk = get_primary_key(module)
     result = where(repo, module, [{pk, ids}], opts)
     if length(result) == length(ids), do: {:ok, result}, else: :error
   end
@@ -90,7 +90,7 @@ defmodule Endon.Helpers do
   end
 
   def stream_where(repo, module, conditions, opts) do
-    [pk] = module.__schema__(:primary_key)
+    pk = get_primary_key(module)
     start = Keyword.get(opts, :start, 0)
     finish = Keyword.get(opts, :finish)
     limit = Keyword.get(opts, :batch_size, 1000)
@@ -193,7 +193,7 @@ defmodule Endon.Helpers do
 
   def last(repo, module, count, opts) do
     {conditions, opts} = Keyword.pop(opts, :conditions, [])
-    [pk] = module.__schema__(:primary_key)
+    pk = get_primary_key(module)
 
     where_opts =
       [order_by: [desc: pk]]
@@ -281,5 +281,10 @@ defmodule Endon.Helpers do
     query
     |> Query.where(^[{f, v}])
     |> add_where(rest)
+  end
+
+  defp get_primary_key(module) do
+    [pk] = module.__schema__(:primary_key)
+    pk
   end
 end
