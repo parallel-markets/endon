@@ -103,9 +103,29 @@ defmodule EndonTest do
       assert UserNone.fetch(1) == :error
     end
 
-    test "when using exists" do
+    test "when using exists?" do
       refute UserNone.exists?(one: 1)
       assert UserSingle.exists?(one: 1)
+    end
+
+    test "when using first without arguments" do
+      assert UserSingle.first() ==
+               "from u0 in UserSingle, order_by: [asc: u0.id], limit: ^1"
+    end
+
+    test "when using first with a count" do
+      assert UserSingle.first(2) ==
+               ["from u0 in UserSingle, order_by: [asc: u0.id], limit: ^2"]
+    end
+
+    test "when using last without arguments" do
+      assert UserSingle.last() ==
+               "from u0 in UserSingle, order_by: [desc: u0.id], limit: ^1"
+    end
+
+    test "when using last with a count" do
+      assert UserSingle.last(2) ==
+               ["from u0 in UserSingle, order_by: [desc: u0.id], limit: ^2"]
     end
   end
 
