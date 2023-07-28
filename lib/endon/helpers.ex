@@ -143,7 +143,7 @@ defmodule Endon.Helpers do
 
   def where(repo, module, conditions, opts) do
     pk = get_primary_key(module)
-    opts_with_defaults = Keyword.put_new(opts, :order_by, [asc: pk])
+    opts_with_defaults = Keyword.put_new(opts, :order_by, asc: pk)
     do_where(repo, module, conditions, opts_with_defaults)
   end
 
@@ -189,8 +189,8 @@ defmodule Endon.Helpers do
     pk = get_primary_key(module)
 
     where_opts =
-      [order_by: [asc: pk]]
-      |> Keyword.merge(opts)
+      opts
+      |> Keyword.put_new(:order_by, asc: pk)
       |> Keyword.put(:limit, count)
 
     result = do_where(repo, module, conditions, where_opts)
@@ -202,8 +202,8 @@ defmodule Endon.Helpers do
     pk = get_primary_key(module)
 
     where_opts =
-      [order_by: [desc: pk]]
-      |> Keyword.merge(opts)
+      opts
+      |> Keyword.put_new(:order_by, desc: pk)
       |> Keyword.put(:limit, count)
 
     result = do_where(repo, module, conditions, where_opts)
