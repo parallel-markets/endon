@@ -54,22 +54,22 @@ defmodule EndonTest do
 
     test "should raise an exception for fetch/2" do
       assert_raise ArgumentError, fn ->
-        NoPrimaryKey.fetch([1,2,3])
+        NoPrimaryKey.fetch([1, 2, 3])
       end
-      
+
       assert_raise ArgumentError, fn ->
         NoPrimaryKey.fetch(1)
-      end      
+      end
     end
 
     test "should raise an exception for find/2" do
       assert_raise ArgumentError, fn ->
-        NoPrimaryKey.find([1,2,3])
+        NoPrimaryKey.find([1, 2, 3])
       end
 
       assert_raise ArgumentError, fn ->
         NoPrimaryKey.find(1)
-      end      
+      end
     end
   end
 
