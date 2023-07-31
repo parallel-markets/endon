@@ -177,7 +177,7 @@ defmodule Endon.Helpers do
     end
 
     result = where(repo, module, conditions, where_opts)
-    if where_opts[:limit] == 1, do: first_or_nil(result), else: result
+    if where_opts[:limit] == 1, do: first_or_nil(result), else: Enum.reverse(result)
   end
 
   def create(repo, module, %module{} = struct) do
