@@ -158,9 +158,12 @@ defmodule Endon do
 
       If one primary key is given, then one struct will be returned (or `:error` if not found)
 
-      If more than one primary key is given in a list, then all of the structs with those ids
+      If more than one primary key value is given in a list, then all of the structs with those ids
       will be returned (and `:error` will be returned if any one of the primary
       keys can't be found).
+
+      Will raise an exception if the module doesn't have a primary key defined, or if it is a
+      composite primary key.
 
       ## Options
 
@@ -189,6 +192,9 @@ defmodule Endon do
       If more than one primary key is given in a list, then all of the structs with those ids
       will be returned (and a `Ecto.NoResultsError` will be raised if any one of the primary
       keys can't be found).
+
+      Will raise an exception if the module doesn't have a primary key defined, or if it is a
+      composite primary key.
 
       ## Options
 
@@ -239,9 +245,11 @@ defmodule Endon do
 
       ## Options
 
-        * `:order_by` - By default, orders by primary key descending
+        * `:order_by` - By default, orders by primary key ascending
         * `:conditions` - Limit results to those matching these conditions.  Value can be
           anything accepted by `where/2` (including a `t:Ecto.Query.t/0`).
+
+      If there is no primary key for the table then `:order_by` must be provided.
 
       ## Examples
 
@@ -272,9 +280,11 @@ defmodule Endon do
 
       ## Options
 
-        * `:order_by` - By default, orders by primary key descending
+        * `:order_by` - By default, orders by primary key descending. Note: if you provide
         * `:conditions` - Limit results to those matching these conditions.  Value can be
           anything accepted by `where/2` (including a `t:Ecto.Query.t/0`).
+
+      If there is no primary key for the table then `:order_by` must be provided.
 
       ## Examples
 
@@ -346,36 +356,6 @@ defmodule Endon do
         do: scope(__MODULE__, conditions)
 
       @doc """
-      Create a `Stream` that queries the data store in batches for matching records.
-
-      This is useful for paginating through a very large result set in chunks.  The `Stream`
-      is a composable, lazy enumerable that allows you to iterate through what could be a
-      very large number of records efficiently.
-
-      The `conditions` are anything accepted by `where/2` (including a `t:Ecto.Query.t/0`).
-      This function will only work for types that have a primary key that is an integer.
-
-      ## Options
-
-        * `:batch_size` - Specifies the size of the batch. Defaults to 1000.
-        * `:start` - Specifies the primary key value to start from, inclusive of the value.
-        * `:finish` - Specifies the primary key value to end at, inclusive of the value.
-
-      ## Examples
-
-          iex> Enum.each(User.stream_where(), &User.do_some_processing/1)
-
-          iex> query = from u in User, where: u.id > 100
-          iex> Enum.each(User.stream_where(query, batch_size: 10), fn user ->
-          iex>   User.do_some_processing(user)
-          iex> end)
-
-      """
-      @spec stream_where(where_conditions(), keyword()) :: Enumerable.t()
-      def stream_where(conditions \\ [], opts \\ []),
-        do: Helpers.stream_where(@repo, __MODULE__, conditions, opts)
-
-      @doc """
       Get the sum of a given column.
 
       `conditions` are anything accepted by `where/2` (including a `t:Ecto.Query.t/0`).
@@ -432,7 +412,7 @@ defmodule Endon do
 
       ## Options
 
-        * `:order_by` - By default, orders by primary key ascending
+        * `:order_by` - By default, no sort order is set
         * `:preload` - A list of fields to preload, much like `c:Ecto.Repo.preload/3`
         * `:offset` - Number to offset by
         * `:limit` - Limit results to the given count

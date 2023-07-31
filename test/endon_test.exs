@@ -2,6 +2,77 @@ defmodule EndonTest do
   use ExUnit.Case
   alias Ecto.{InvalidChangesetError, NoResultsError}
 
+  describe "a table with a composite primary key" do
+    import UserHelpers
+
+    test "should support a call to first/2" do
+      result = CompositePrimaryKey.first()
+
+      assert result ==
+               "from c0 in CompositePrimaryKey, order_by: [asc: c0.part_one, asc: c0.part_two], limit: ^1"
+    end
+
+    test "should support a call to last/2" do
+      result = CompositePrimaryKey.last()
+
+      assert result ==
+               "from c0 in CompositePrimaryKey, order_by: [desc: c0.part_one, desc: c0.part_two], limit: ^1"
+    end
+  end
+
+  describe "a table with no primary key" do
+    import UserHelpers
+
+    test "should not permit a call to last/2" do
+      assert_raise ArgumentError, fn ->
+        NoPrimaryKey.last()
+      end
+    end
+
+    test "should permit a call to last/2 if order_by provided" do
+      result = NoPrimaryKey.last(1, order_by: :info)
+      assert result == "from n0 in NoPrimaryKey, order_by: [desc: n0.info], limit: ^1"
+    end
+
+    test "should support a call to last/2 if order_by is provided with multiple keys" do
+      result = NoPrimaryKey.last(1, order_by: [asc: :info, desc: :other_info])
+
+      assert result ==
+               "from n0 in NoPrimaryKey, order_by: [desc: n0.info, asc: n0.other_info], limit: ^1"
+    end
+
+    test "should not permit a call to first/2" do
+      assert_raise ArgumentError, fn ->
+        NoPrimaryKey.first()
+      end
+    end
+
+    test "should permit a call to first/2 if order_by provided" do
+      result = NoPrimaryKey.first(1, order_by: :info)
+      assert result == "from n0 in NoPrimaryKey, order_by: [asc: n0.info], limit: ^1"
+    end
+
+    test "should raise an exception for fetch/2" do
+      assert_raise ArgumentError, fn ->
+        NoPrimaryKey.fetch([1,2,3])
+      end
+      
+      assert_raise ArgumentError, fn ->
+        NoPrimaryKey.fetch(1)
+      end      
+    end
+
+    test "should raise an exception for find/2" do
+      assert_raise ArgumentError, fn ->
+        NoPrimaryKey.find([1,2,3])
+      end
+
+      assert_raise ArgumentError, fn ->
+        NoPrimaryKey.find(1)
+      end      
+    end
+  end
+
   describe "building queries via scope" do
     import UserHelpers
     import Ecto.Query, only: [from: 2]
@@ -26,7 +97,7 @@ defmodule EndonTest do
       result = UserSingle.first(1, conditions: scoped)
 
       assert result ==
-               "from u0 in UserSingle, where: u0.id == 1, where: u0.org_id == ^123, limit: ^1"
+               "from u0 in UserSingle, where: u0.id == 1, where: u0.org_id == ^123, order_by: [asc: u0.id], limit: ^1"
     end
   end
 
@@ -49,10 +120,6 @@ defmodule EndonTest do
       assert UserSingle.where(id: 1, limit: 2) == [
                "from u0 in UserSingle, where: u0.id == ^1, where: u0.limit == ^2"
              ]
-    end
-
-    test "when using stream_where" do
-      assert Enum.to_list(UserNone.stream_where()) == []
     end
 
     test "when using find" do

@@ -1,4 +1,14 @@
-# Changelog for v1.x
+# Changelog
+
+## v2.0.0 (2023-08-01)
+
+### Breaking Changes
+
+  * All support for the `stream_where/2` function was removed in favor of https://hexdocs.pm/ecto/Ecto.Repo.html#c:stream/2
+
+### Bug Fixes
+
+  * Fixed a bug that would have caused issues with first/last/fetch/find when there is no primary key (or a composite primary key)
 
 ## v1.0.6 (2022-09-26)
 

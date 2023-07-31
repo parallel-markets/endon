@@ -11,13 +11,8 @@ defmodule Endon.Helpers do
   end
 
   def exists?(repo, module, conditions) do
-    case where(repo, module, conditions, limit: 1) do
-      [] ->
-        false
-
-      [_] ->
-        true
-    end
+    results = where(repo, module, conditions, limit: 1)
+    length(results) == 1
   end
 
   def delete(repo, _module, struct),
@@ -45,15 +40,25 @@ defmodule Endon.Helpers do
         result
 
       :error ->
+        # if nothing was raised in the fetch, then we know there's a single
+        # primary key defined, but we didn't get all the results we expected
         [pk] = module.__schema__(:primary_key)
         raise NoResultsError, queryable: add_where(module, [{pk, ids}])
     end
   end
 
   def fetch(repo, module, ids, opts) when is_list(ids) do
-    [pk] = module.__schema__(:primary_key)
-    result = where(repo, module, [{pk, ids}], opts)
-    if length(result) == length(ids), do: {:ok, result}, else: :error
+    case module.__schema__(:primary_key) do
+      [] ->
+        raise ArgumentError, message: "No primary key defined for #{module}"
+
+      [pk] ->
+        result = where(repo, module, [{pk, ids}], opts)
+        if length(result) == length(ids), do: {:ok, result}, else: :error
+
+      [_ | _] ->
+        raise ArgumentError, message: "Composite primary key defined for #{module}"
+    end
   end
 
   def fetch(repo, module, id, opts) do
@@ -87,50 +92,6 @@ defmodule Endon.Helpers do
           create(repo, module, conditions)
       end
     end)
-  end
-
-  def stream_where(repo, module, conditions, opts) do
-    [pk] = module.__schema__(:primary_key)
-    start = Keyword.get(opts, :start, 0)
-    finish = Keyword.get(opts, :finish)
-    limit = Keyword.get(opts, :batch_size, 1000)
-
-    new_opts = Keyword.drop(opts, [:start, :finish, :batch_size])
-    basequery = module |> add_where(conditions) |> add_opts(new_opts, [:preload])
-
-    query =
-      if is_nil(finish) do
-        from(x in basequery, limit: ^limit, order_by: [asc: ^pk])
-      else
-        from(x in basequery, where: field(x, ^pk) <= ^finish, limit: ^limit, order_by: [asc: ^pk])
-      end
-
-    initparams = %{
-      pk: pk,
-      repo: repo,
-      start: start,
-      query: query,
-      more_possible: true,
-      limit: limit
-    }
-
-    Stream.resource(fn -> initparams end, &stream_iter/1, & &1)
-  end
-
-  defp stream_iter(%{more_possible: false}), do: {:halt, nil}
-
-  defp stream_iter(
-         %{pk: pk, repo: repo, start: start, query: query, more_possible: true, limit: limit} =
-           params
-       ) do
-    case repo.all(from(x in query, where: field(x, ^pk) >= ^start)) do
-      [] ->
-        {:halt, nil}
-
-      results ->
-        lastid = Map.get(hd(Enum.take(results, -1)), pk)
-        {results, %{params | start: lastid + 1, more_possible: length(results) == limit}}
-    end
   end
 
   def find_by(repo, module, conditions, opts) do
@@ -186,19 +147,34 @@ defmodule Endon.Helpers do
 
   def first(repo, module, count, opts) do
     {conditions, opts} = Keyword.pop(opts, :conditions, [])
-    where_opts = Keyword.put(opts, :limit, count)
+
+    where_opts =
+      opts
+      |> Keyword.put(:limit, count)
+      |> put_new_order_by_opt(module)
+
+    unless Keyword.has_key?(where_opts, :order_by) do
+      msg = "Cannot call first/2 without a primary key set or :order_by argument provided"
+      raise ArgumentError, message: msg
+    end
+
     result = where(repo, module, conditions, where_opts)
     if where_opts[:limit] == 1, do: first_or_nil(result), else: result
   end
 
   def last(repo, module, count, opts) do
     {conditions, opts} = Keyword.pop(opts, :conditions, [])
-    [pk] = module.__schema__(:primary_key)
 
     where_opts =
-      [order_by: [desc: pk]]
-      |> Keyword.merge(opts)
+      opts
       |> Keyword.put(:limit, count)
+      |> put_new_order_by_opt(module)
+      |> reverse_order_by_opt()
+
+    unless Keyword.has_key?(where_opts, :order_by) do
+      msg = "Cannot call last/2 without a primary key set or :order_by argument provided"
+      raise ArgumentError, message: msg
+    end
 
     result = where(repo, module, conditions, where_opts)
     if where_opts[:limit] == 1, do: first_or_nil(result), else: result
@@ -242,6 +218,42 @@ defmodule Endon.Helpers do
 
   defp first_or_nil([]), do: nil
   defp first_or_nil([first | _]), do: first
+
+  # Given an options keyword list - if :order_by is provided, do nothing. If
+  # there is a primary key set for the module, use that as the :order_by.
+  # If there is no :order_by provided and no primary key, do nothing.
+  defp put_new_order_by_opt(opts, module) do
+    case {Keyword.get(opts, :order_by), module.__schema__(:primary_key)} do
+      {nil, []} ->
+        # No order_by given, but we also don't have a primary key available
+        opts
+
+      {nil, pk} ->
+        # No order_by was given, but we do have a primary key
+        Keyword.put(opts, :order_by, pk)
+
+      _ ->
+        # An order_by was given
+        opts
+    end
+  end
+
+  # Reverse the order of all keys provided in the :order_by option
+  # in the given keyword list.  If :order_by isn't provided, do nothing.
+  defp reverse_order_by_opt(opts) do
+    opts
+    |> Keyword.get(:order_by, [])
+    |> List.wrap()
+    |> Enum.into([], fn
+      {:asc, key} -> {:desc, key}
+      {:desc, key} -> {:asc, key}
+      key when is_atom(key) -> {:desc, key}
+    end)
+    |> case do
+      [] -> opts
+      order_by -> Keyword.put(opts, :order_by, order_by)
+    end
+  end
 
   defp add_opts(query, [], _allowed_opts), do: query
 
