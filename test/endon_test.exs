@@ -164,6 +164,36 @@ defmodule EndonTest do
       refute UserNone.exists?(one: 1)
       assert UserSingle.exists?(one: 1)
     end
+
+    test "when using first with a count" do
+      assert UserSingle.first(42) == ["from u0 in UserSingle, order_by: [asc: u0.id], limit: ^42"]
+    end
+
+    test "when using first with a count and order_by" do
+      assert UserSingle.first(42, order_by: :info) == [
+               "from u0 in UserSingle, order_by: [asc: u0.info], limit: ^42"
+             ]
+    end
+
+    test "when using first with no count and order_by" do
+      assert UserSingle.first(order_by: :info) ==
+               "from u0 in UserSingle, order_by: [asc: u0.info], limit: ^1"
+    end
+
+    test "when using last with a count" do
+      assert UserSingle.last(42) == ["from u0 in UserSingle, order_by: [desc: u0.id], limit: ^42"]
+    end
+
+    test "when using last with a count and order_by" do
+      assert UserSingle.last(42, order_by: :info) == [
+               "from u0 in UserSingle, order_by: [desc: u0.info], limit: ^42"
+             ]
+    end
+
+    test "when using last with no count and order_by" do
+      assert UserSingle.last(order_by: :info) ==
+               "from u0 in UserSingle, order_by: [desc: u0.info], limit: ^1"
+    end
   end
 
   describe "updating records should work" do
