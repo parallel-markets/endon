@@ -266,7 +266,7 @@ defmodule Endon do
       @spec first(integer(), keyword()) :: [Ecto.Schema.t()] | Ecto.Schema.t() | nil
       def first(count \\ 1, opts \\ [])
 
-      def first(count, opts),
+      def first(count, opts) when is_integer(count),
         do: Helpers.first(@repo, __MODULE__, count, opts)
 
       @doc """
@@ -302,7 +302,7 @@ defmodule Endon do
       @spec last(integer(), keyword()) :: [Ecto.Schema.t()] | Ecto.Schema.t() | nil
       def last(count \\ 1, opts \\ [])
 
-      def last(count, opts),
+      def last(count, opts) when is_integer(count),
         do: Helpers.last(@repo, __MODULE__, count, opts)
 
       @doc """
