@@ -65,6 +65,47 @@ defmodule UserOK do
   schema("users", do: nil)
 end
 
+defmodule NoPrimaryKey do
+  import UserHelpers
+
+  defmodule Repo do
+    def one(input), do: [i(input), nil]
+    def update(input), do: {:ok, input}
+    def insert(input), do: {:ok, input}
+    def delete(input), do: {:ok, input}
+    def all(input), do: [i(input), nil]
+  end
+
+  use Endon, repo: Repo
+  use Ecto.Schema
+
+  @primary_key false
+
+  schema "users" do
+    field(:info, :string)
+    field(:other_info, :integer)
+  end
+end
+
+defmodule CompositePrimaryKey do
+  import UserHelpers
+
+  defmodule Repo do
+    def one(input), do: [i(input), nil]
+    def all(input), do: [i(input), nil]
+  end
+
+  use Endon, repo: Repo
+  use Ecto.Schema
+
+  @primary_key false
+
+  schema "users" do
+    field(:part_one, :integer, primary_key: true)
+    field(:part_two, :integer, primary_key: true)
+  end
+end
+
 defmodule UserError do
   use Endon, repo: UserError.Repo
   use Ecto.Schema
