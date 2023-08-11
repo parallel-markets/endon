@@ -97,14 +97,14 @@ defmodule Endon.Helpers do
   def find_by(repo, module, conditions, opts) do
     module
     |> add_where(conditions)
-    |> add_opts([limit: 1] ++ opts, [:limit, :preload])
+    |> add_opts([limit: 1] ++ opts, [:limit, :preload, :lock])
     |> repo.one()
   end
 
   def where(repo, module, conditions, opts) do
     module
     |> add_where(conditions)
-    |> add_opts(opts, [:limit, :order_by, :offset, :preload])
+    |> add_opts(opts, [:limit, :order_by, :offset, :preload, :lock])
     |> repo.all()
   end
 
@@ -269,6 +269,15 @@ defmodule Endon.Helpers do
   defp apply_opt(query, :limit, limit), do: Query.limit(query, ^limit)
   defp apply_opt(query, :preload, preload), do: Query.preload(query, ^preload)
   defp apply_opt(query, :offset, offset), do: Query.offset(query, ^offset)
+
+  # The second argument to `Query.lock/2` must be a fragment or string literal, so
+  # supported clauses should be hardcoded here.
+  defp apply_opt(query, :lock, "FOR UPDATE"), do: Query.lock(query, "FOR UPDATE")
+
+  defp apply_opt(_query, :lock, clause) do
+    err_msg = "Lock clause '#{clause}' is not yet supported via Endon.apply_opt/3"
+    raise ArgumentError, message: err_msg
+  end
 
   defp add_where(query, []), do: query
 

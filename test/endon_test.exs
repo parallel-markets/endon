@@ -117,8 +117,14 @@ defmodule EndonTest do
     end
 
     test "when using where with limit keyword" do
-      assert UserSingle.where(id: 1, limit: 2) == [
-               "from u0 in UserSingle, where: u0.id == ^1, where: u0.limit == ^2"
+      assert UserSingle.where([id: 1], limit: 2) == [
+               "from u0 in UserSingle, where: u0.id == ^1, limit: ^2"
+             ]
+    end
+
+    test "when using where with a limit and a lock clause" do
+      assert UserSingle.where([id: 1], limit: 1, lock: "FOR UPDATE") == [
+               "from u0 in UserSingle, where: u0.id == ^1, limit: ^1, lock: \"FOR UPDATE\""
              ]
     end
 
@@ -133,6 +139,16 @@ defmodule EndonTest do
       assert_raise(NoResultsError, fn ->
         UserNone.find(1)
       end)
+    end
+
+    test "when using find with a lock clause" do
+      assert UserSingle.find(1, lock: "FOR UPDATE") ==
+               "from u0 in UserSingle, where: u0.id in ^[1], lock: \"FOR UPDATE\""
+
+      assert UserDouble.find([1, 2], lock: "FOR UPDATE") == [
+               "from u0 in UserDouble, where: u0.id in ^[1, 2], lock: \"FOR UPDATE\"",
+               nil
+             ]
     end
 
     test "when using find_by" do
