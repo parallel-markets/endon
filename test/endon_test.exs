@@ -112,6 +112,10 @@ defmodule EndonTest do
       assert UserSingle.where(id: 1) == ["from u0 in UserSingle, where: u0.id == ^1"]
     end
 
+    test "when using where with a limit" do
+      assert UserSingle.where([id: 1], lock: :for_update) == ["from u0 in UserSingle, where: u0.id == ^1, lock: \"FOR UPDATE\""]
+    end
+
     test "when using where with a map" do
       assert UserSingle.where(%{id: 1}) == ["from u0 in UserSingle, where: u0.id == ^1"]
     end

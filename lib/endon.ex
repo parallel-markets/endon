@@ -168,7 +168,7 @@ defmodule Endon do
       ## Options
 
         * `:preload` - A list of fields to preload, much like `c:Ecto.Repo.preload/3`
-
+        * `:lock` - Row level lock in the select. Currently only `:for_update` is supported.
       """
       @spec fetch(integer() | list(integer()), keyword()) ::
               {:ok, list(Ecto.Schema.t())} | {:ok, Ecto.Schema.t()} | :error
@@ -198,8 +198,8 @@ defmodule Endon do
 
       ## Options
 
-        * `:preload` - A list of fields to preload, much like `c:Ecto.Repo.preload/3`
-
+       * `:preload` - A list of fields to preload, much like `c:Ecto.Repo.preload/3`
+       * `:lock` - Row level lock in the select. Currently only `:for_update` is supported.
       """
       @spec find(integer() | list(integer()), keyword()) ::
               list(Ecto.Schema.t()) | Ecto.Schema.t()
@@ -214,7 +214,7 @@ defmodule Endon do
       ## Options
 
         * `:preload` - A list of fields to preload, much like `c:Ecto.Repo.preload/3`
-
+        * `:lock` - Row level lock in the select. Currently only `:for_update` is supported.
       """
       @spec find_by(where_conditions(), keyword()) :: Ecto.Schema.t() | nil
       def find_by(conditions, opts \\ []),
@@ -417,6 +417,7 @@ defmodule Endon do
         * `:preload` - A list of fields to preload, much like `c:Ecto.Repo.preload/3`
         * `:offset` - Number to offset by
         * `:limit` - Limit results to the given count
+        * `:lock` - Row level lock in the select. Currently only `:for_update` is supported.
 
       ## Examples
 
