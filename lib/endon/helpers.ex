@@ -97,14 +97,14 @@ defmodule Endon.Helpers do
   def find_by(repo, module, conditions, opts) do
     module
     |> add_where(conditions)
-    |> add_opts([limit: 1] ++ opts, [:limit, :preload])
+    |> add_opts([limit: 1] ++ opts, [:limit, :preload, :lock])
     |> repo.one()
   end
 
   def where(repo, module, conditions, opts) do
     module
     |> add_where(conditions)
-    |> add_opts(opts, [:limit, :order_by, :offset, :preload])
+    |> add_opts(opts, [:limit, :order_by, :offset, :preload, :lock])
     |> repo.all()
   end
 
@@ -269,6 +269,8 @@ defmodule Endon.Helpers do
   defp apply_opt(query, :limit, limit), do: Query.limit(query, ^limit)
   defp apply_opt(query, :preload, preload), do: Query.preload(query, ^preload)
   defp apply_opt(query, :offset, offset), do: Query.offset(query, ^offset)
+  # for security reasons, locks must always be literal strings
+  defp apply_opt(query, :lock, :for_update), do: Query.lock(query, "FOR UPDATE")
 
   defp add_where(query, []), do: query
 
