@@ -4,7 +4,7 @@
 
 ### Enhancements
 
-  * Add support for the `:limit` option (#8)
+  * Add support for the `:lock` option (#8)
 
 ## v2.0.0 (2023-08-01)
 
