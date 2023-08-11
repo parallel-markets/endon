@@ -97,7 +97,7 @@ defmodule Endon.Helpers do
   def find_by(repo, module, conditions, opts) do
     module
     |> add_where(conditions)
-    |> add_opts([limit: 1] ++ opts, [:limit, :preload])
+    |> add_opts([limit: 1] ++ opts, [:limit, :preload, :lock])
     |> repo.one()
   end
 
