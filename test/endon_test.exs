@@ -123,8 +123,8 @@ defmodule EndonTest do
     end
 
     test "when using where with limit keyword" do
-      assert UserSingle.where(id: 1, limit: 2) == [
-               "from u0 in UserSingle, where: u0.id == ^1, where: u0.limit == ^2"
+      assert UserSingle.where([id: 1], limit: 2) == [
+               "from u0 in UserSingle, where: u0.id == ^1, limit: ^2"
              ]
     end
 
