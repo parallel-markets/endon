@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.0.1 (2023-08-11)
+
+### Enhancements
+
+  * Add support for the `:limit` option (#8)
+
 ## v2.0.0 (2023-08-01)
 
 ### Breaking Changes
