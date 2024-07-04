@@ -189,7 +189,7 @@ defmodule Endon.Helpers do
   end
 
   def create(repo, module, params) when is_map(params) do
-    module.__struct__
+    module.__struct__()
     |> changeset(params, module)
     |> repo.insert()
   end

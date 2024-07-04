@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.0.2 (TBD)
+
+  * Add support for Elixir 1.17.x
+
 ## v2.0.1 (2023-08-11)
 
 ### Enhancements
