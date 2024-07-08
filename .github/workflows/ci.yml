@@ -6,21 +6,51 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: [24, 25]
-        elixir: ["1.13", "1.14", "1.15", "1.16"]
+        include:
+          - pair:
+              otp: 27.x
+              elixir: 1.17.x
+          - pair:
+              otp: 26.x
+              elixir: 1.16.x
+          - pair:
+              otp: 26.x
+              elixir: 1.15.x
+          - pair:
+              otp: 25.x
+              elixir: 1.15.x
+          - pair:
+              otp: 25.x
+              elixir: 1.14.x
+          - pair:
+              otp: 25.x
+              elixir: 1.13.x
+          - pair:
+              otp: 24.x
+              elixir: 1.15.x
+          - pair:
+              otp: 24.x
+              elixir: 1.14.x
+          - pair:
+              otp: 24.x
+              elixir: 1.13.x
+          - pair:
+              otp: 24.x
+              elixir: 1.12.x
+
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
-          elixir-version: ${{matrix.elixir}}
-          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.pair.elixir}}
+          otp-version: ${{matrix.pair.otp}}
       - uses: actions/cache@v4
         id: mix-cache # id to use in retrieve action
         with:
           path: |
             _build
             deps
-          key: test-cache-v0-${{matrix.elixir}}-${{matrix.otp}}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          key: test-cache-v0-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
       - if: steps.mix-cache.outputs.cache-hit != 'true'
         run: mix do deps.get, deps.compile
       - run: mix credo
@@ -31,8 +61,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: [24]
-        elixir: ["1.15"]
+        otp: [27]
+        elixir: ["1.17"]
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
