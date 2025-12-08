@@ -85,6 +85,14 @@ defmodule EndonTest do
       assert map_result == "from u0 in UserSingle, where: u0.id == ^1"
     end
 
+    test "should process nil value correctly" do
+      kw_result = i(UserSingle.scope(id: nil))
+      assert kw_result == "from u0 in UserSingle, where: is_nil(u0.id)"
+
+      map_result = i(UserSingle.scope(%{id: nil}))
+      assert map_result == "from u0 in UserSingle, where: is_nil(u0.id)"
+    end
+
     test "should build on a query successfully" do
       query = from(x in UserSingle, where: x.id == 1)
       result = query |> UserSingle.scope(org_id: 123) |> i()
@@ -112,6 +120,10 @@ defmodule EndonTest do
       assert UserSingle.where(id: 1) == ["from u0 in UserSingle, where: u0.id == ^1"]
     end
 
+    test "when using where with nil value" do
+      assert UserSingle.where(id: nil) == ["from u0 in UserSingle, where: is_nil(u0.id)"]
+    end
+
     test "when using where with a limit" do
       assert UserSingle.where([id: 1], lock: :for_update) == [
                "from u0 in UserSingle, where: u0.id == ^1, lock: \"FOR UPDATE\""
@@ -120,6 +132,10 @@ defmodule EndonTest do
 
     test "when using where with a map" do
       assert UserSingle.where(%{id: 1}) == ["from u0 in UserSingle, where: u0.id == ^1"]
+    end
+
+    test "when using where with a map and nil value" do
+      assert UserSingle.where(%{id: nil}) == ["from u0 in UserSingle, where: is_nil(u0.id)"]
     end
 
     test "when using where with limit keyword" do
