@@ -3,7 +3,7 @@
 ## v2.0.3 (2025-12-08)
 
  * Add support for Elixir 1.18.x and 1.19.x
- * Drop Elixir 1.12.x support
+ * Drop support for Elixir 1.12.x and 1.13.x
 
 ## v2.0.2 (2024-07-08)
 
