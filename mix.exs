@@ -2,21 +2,24 @@ defmodule Endon.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/parallel-markets/endon"
-  @version "2.0.2"
+  @version "2.0.3"
 
   def project do
     [
       app: :endon,
       aliases: aliases(),
       version: @version,
-      elixir: "~> 1.9",
+      elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       description: "Ecto query helpers, inspired by ActiveRecord",
       package: package(),
-      docs: docs(),
-      preferred_cli_env: [test: :test, "ci.test": :test]
+      docs: docs()
     ]
+  end
+
+  def cli do
+    [preferred_envs: [test: :test, "ci.test": :test]]
   end
 
   defp aliases do
