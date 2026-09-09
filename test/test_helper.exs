@@ -1,7 +1,7 @@
 ExUnit.start()
 
 defmodule UserHelpers do
-  use ExUnit.Case
+  import ExUnit.Assertions
 
   def i(query) do
     assert "#Ecto.Query<" <> rest = inspect(query)
