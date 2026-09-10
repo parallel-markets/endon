@@ -8,6 +8,9 @@ jobs:
       matrix:
         include:
           - pair:
+              otp: 29.x
+              elixir: 1.20.x
+          - pair:
               otp: 28.x
               elixir: 1.19.x
           - pair:
@@ -58,8 +61,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: [28]
-        elixir: ["1.19"]
+        otp: [29]
+        elixir: ["1.20"]
     steps:
       - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
