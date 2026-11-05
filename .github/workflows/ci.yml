@@ -3,7 +3,8 @@ on: push
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # ubuntu-24.x maintains support for OTP 24.x in our text matrix
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         include:
