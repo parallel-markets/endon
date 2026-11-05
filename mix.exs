@@ -2,7 +2,7 @@ defmodule Endon.MixProject do
   use Mix.Project
 
   @source_url "https://github.com/parallel-markets/endon"
-  @version "2.0.3"
+  @version "2.0.4"
 
   def project do
     [
